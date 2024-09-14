@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Website Analyzer</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+
+        h1, h2 {
+            font-family: 'Helvetica', sans-serif;
+        }
+
+        /* Header */
+        header {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        /* Main Section */
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        label {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            font-size: 16px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        /* Results Section */
+        section#results {
+            margin-top: 30px;
+        }
+
+        section#results p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            main {
+                padding: 20px;
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Website Analyzer</h1>
+    </header>
+
+    <!-- Main Form and Results Section -->
+    <main>
+        <!-- Form to Input Website URL -->
+        <form id="analyzerForm">
+            <label for="url">Enter Website URL:</label>
+            <input type="url" id="url" placeholder="https://example.com" required>
+            <button type="submit">Analyze</button>
+        </form>
+
+        <!-- Results Section -->
+        <section id="results">
+            <h2>Analysis Results</h2>
+            <p><strong>Page Title:</strong> <span id="title">N/A</span></p>
+            <p><strong>Meta Description:</strong> <span id="description">N/A</span></p>
+            <p><strong>Meta Keywords:</strong> <span id="keywords">N/A</span></p>
+            <p><strong>Main Heading (h1):</strong> <span id="mainHeading">N/A</span></p>
+            <p><strong>Open Graph Title:</strong> <span id="ogTitle">N/A</span></p>
+            <p><strong>Open Graph Description:</strong> <span id="ogDescription">N/A</span></p>
+            <p><strong>Application Name:</strong> <span id="appName">N/A</span></p>
+            <p><strong>Number of Images:</strong> <span id="images">0</span></p>
+            <p><strong>Number of Links:</strong> <span id="links">0</span></p>
+            <p><strong>Number of Scripts:</strong> <span id="scripts">0</span></p>
+            <p><strong>Number of Stylesheets:</strong> <span id="stylesheets">0</span></p>
+            <p><strong>Favicon:</strong> <span id="favicon">N/A</span></p>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('analyzerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const url = document.getElementById('url').value.trim();
+
+            if (!url) {
+                alert('Please enter a valid URL.');
+                return;
+            }
+
+            analyzeWebsite(url);
+        });
+
+        function analyzeWebsite(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Analyze page title
+                    const title = doc.querySelector('title') ? doc.querySelector('title').textContent : 'No title';
+
+                    // Analyze meta description
+                    const description = doc.querySelector('meta[name="description"]') ? doc.querySelector('meta[name="description"]').getAttribute('content') : 'No description';
+
+                    // Analyze meta keywords
+                    const keywords = doc.querySelector('meta[name="keywords"]') ? doc.querySelector('meta[name="keywords"]').getAttribute('content') : 'No keywords';
+
+                    // Analyze Open Graph Title & Description
+                    const ogTitle = doc.querySelector('meta[property="og:title"]') ? doc.querySelector('meta[property="og:title"]').getAttribute('content') : 'No Open Graph title';
+                    const ogDescription = doc.querySelector('meta[property="og:description"]') ? doc.querySelector('meta[property="og:description"]').getAttribute('content') : 'No Open Graph description';
+
+                    // Analyze h1 (Main Heading)
+                    const mainHeading = doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'No main heading';
+
+                    // Analyze Application Name (if available)
+                    const appName = doc.querySelector('meta[name="application-name"]') ? doc.querySelector('meta[name="application-name"]').getAttribute('content') : 'No application name';
+
+                    // Analyze number of images
+                    const images = doc.querySelectorAll('img').length;
+
+                    // Analyze number of links
+                    const links = doc.querySelectorAll('a').length;
+
+                    // Analyze number of scripts
+                    const scripts = doc.querySelectorAll('script').length;
+
+                    // Analyze number of stylesheets
+                    const stylesheets = doc.querySelectorAll('link[rel="stylesheet"]').length;
+
+                    // Analyze favicon
+                    const favicon = doc.querySelector('link[rel="icon"]') ? doc.querySelector('link[rel="icon"]').getAttribute('href') : 'No favicon';
+
+                    // Display results
+                    document.getElementById('title').textContent = title;
+                    document.getElementById('description').textContent = description;
+                    document.getElementById('keywords').textContent = keywords;
+                    document.getElementById('ogTitle').textContent = ogTitle;
+                    document.getElementById('ogDescription').textContent = ogDescription;
+                    document.getElementById('mainHeading').textContent = mainHeading;
+                    document.getElementById('appName').textContent = appName;
+                    document.getElementById('images').textContent = images;
+                    document.getElementById('links').textContent = links;
+                    document.getElementById('scripts').textContent = scripts;
+                    document.getElementById('stylesheets').textContent = stylesheets;
+                    document.getElementById('favicon').textContent = favicon;
+                })
+                .catch(error => {
+                    alert('An error occurred while analyzing the website. Please check the URL and try again.');
+                    console.error(error);
+                });
+        }
+    </script>
+
+</body>
+</html>
